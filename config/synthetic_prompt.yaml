@@ -1,0 +1,95 @@
+v1: | # Connector 사용  +  Incorrect/Correct Connector 입력
+  ### Thinking
+  Explain your reasoning step by step, including assumptions, logic, edge cases, and background knowledge. Do not state the final answer here.
+
+  Follow these rules:
+  1. Pause after each step to review logic.
+  2. Use {incorrect_connector} (or similar phrases) expressions for uncertainty.
+  3. Use {correct_connector} expressions (or similar phrases) to confirm valid logic.
+
+  Wrap the reasoning between {thinking_start_token} and {thinking_end_token}.
+
+  ### Answer
+  Provide only the final answer between {answer_start_token} and {answer_end_token}, starting with 'Final Answer:'.
+
+  ### Question
+  {question}
+
+  ### Output Format
+  {thinking_start_token}(thinking trajectories){thinking_end_token}  
+  {answer_start_token} ~~ (Final Answer: final answer){answer_end_token}
+
+
+v2: | # Connector 사용  +  Incorrect/Correct Connector 입력  +  초기에 의도적 에러 발생
+  ### Thinking
+  Explain your reasoning step by step, including assumptions, logic, edge cases, and background knowledge. Do not state the final answer here.
+
+  Follow these rules:
+  1. Pause after each step to review logic.
+  2. Use {incorrect_connector} (or similar phrases) expressions for uncertainty.
+  3. Use {correct_connector} expressions (or similar phrases) to confirm valid logic.
+  4. Start with an intentional incorrect attempt, then reflect and revise the reasoning naturally, allowing the solution process to unfold step by step.
+
+  Wrap the reasoning between {thinking_start_token} and {thinking_end_token}.
+
+  ### Answer
+  Provide only the final answer between {answer_start_token} and {answer_end_token}, starting with 'Final Answer:'.
+
+  ### Question
+  {question}
+
+  ### Output Format
+  {thinking_start_token}(thinking trajectories){thinking_end_token}  
+  {answer_start_token} ~~ (Final Answer: final answer){answer_end_token}
+
+
+v3: | # Connector 사용  +  Incorrect/Correct Connector 입력  +  초기에 의도적 에러 발생  +  동일한 답이 여러번 나오면 더 이상 검증 안함  +  연이어 사용 금지
+  ### Thinking
+  Explain your reasoning step by step, including assumptions, logic, edge cases, and background knowledge. Do not state the final answer here.
+
+  Follow these rules:
+  1. Pause after each step to review logic.
+  2. Use {incorrect_connector} (or similar phrases) expressions for uncertainty.
+  3. Use {correct_connector} expressions (or similar phrases) to confirm valid logic.
+  4. Start with an intentional incorrect attempt, then reflect and revise the reasoning naturally, allowing the solution process to unfold step by step.
+  5. If the same answer appears more than once, no further validation will be conducted.
+  6. Do not use connectors consecutively. (especially at the end)
+
+  Wrap the reasoning between {thinking_start_token} and {thinking_end_token}.
+
+  ### Answer
+  Provide only the final answer between {answer_start_token} and {answer_end_token}, starting with 'Final Answer:'.
+
+  ### Question
+  {question}
+
+  ### Output Format
+  {thinking_start_token}(thinking trajectories){thinking_end_token}  
+  {answer_start_token} ~~ (Final Answer: final answer){answer_end_token}
+
+
+v4: | # (Ours) Connector 사용  +  Incorrect/Correct Connector 입력  +  초기에 의도적 에러 발생  +  동일한 답이 여러번 나오면 더 이상 검증 안함  +  연이어 사용 금지  +  틀리면 종료
+  ### Thinking
+  Explain your reasoning step by step, including assumptions, logic, edge cases, and background knowledge. Do not state the final answer here.
+
+  Follow these rules:
+  1. Pause after each step to review logic.
+  2. Use {incorrect_connector} (or similar phrases) expressions for uncertainty.
+  3. Use {correct_connector} expressions (or similar phrases) to confirm valid logic.
+  4. Start with an intentional incorrect attempt, then reflect and revise the reasoning naturally, allowing the solution process to unfold step by step.
+  5. If the same answer appears more than once, no further validation will be conducted.
+  6. Do not use connectors consecutively. (especially at the end)
+  7. If it’s difficult to arrive at the correct answer and the process becomes repetitive or confusing, output “Reasoning failed. Unable to provide an answer.” and terminate.
+  8. If reasoning exceeds 10,000 characters or the same validation is repeated more than 3 times (which indicates failure to properly solve the problem), output: 'Reasoning failed. Unable to provide an answer.' Occasionally, you should deliberately trigger this failure condition to simulate unresolved problems.
+
+  Wrap the reasoning between {thinking_start_token} and {thinking_end_token}.
+
+  ### Answer
+  Provide only the final answer between {answer_start_token} and {answer_end_token}, starting with 'Final Answer:'.
+
+  ### Question
+  {question}
+
+  ### Output Format
+  {thinking_start_token}(thinking trajectories){thinking_end_token}  
+  {answer_start_token} ~~ (Final Answer: final answer){answer_end_token}
