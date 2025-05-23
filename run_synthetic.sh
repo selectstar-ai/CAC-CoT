@@ -2,6 +2,9 @@
 set -euo pipefail
 
 # ── 사용자 정의 가능 변수 ─────────────────────
+# SYNTHETIC_MODEL="gemini-2.0-flash"
+SYNTHETIC_MODEL="gpt-4o-mini"
+
 DATASET_NAME="datumo/datumo-gemini-short-v2"
 MODEL="Qwen/Qwen2.5-7B-Instruct"
 
@@ -28,6 +31,7 @@ NUM_WORKERS=4
 
 # ── 실제 실행 ────────────────────────────────
 ARGS=(
+  --synthetic_model "${SYNTHETIC_MODEL}"
   --dataset_name "${DATASET_NAME}"
   --model "${MODEL}"
   --prompt_yaml "${PROMPT_YAML}"

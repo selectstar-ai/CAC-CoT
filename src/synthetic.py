@@ -7,6 +7,7 @@ import numpy as np
 import concurrent.futures
 
 from google import genai
+from openai import OpenAI
 from datasets import load_dataset, Dataset, DatasetDict
 from typing import Tuple, List
 from tqdm import tqdm
@@ -28,6 +29,10 @@ def parse_args() -> argparse.Namespace:
     --num_workers: 병렬 작업자 수
     """
     p = argparse.ArgumentParser(description="Generate CAC-CoT synthetic dataset.")
+
+    # -- SYNTHETIC MODEL
+    p.add_argument("--synthetic_model", default="gemini-2.0-flash", 
+                   help="다음 모델들을 선택할 수 있습니다. (gemini-2.0-flash, gpt-4o, gpt-4o-mini)")
 
     # -- DATA
     p.add_argument("--dataset_name", default="datumo/datumo-gemini-short-v2", help="HuggingFace 데이터 파일을 로드합니다.")
@@ -122,13 +127,6 @@ def gemini_qa(prompt: str,
               model_name: str = "gemini-2.0-flash") -> str:
     """
     Gemini API에 쿼리하여 텍스트를 생성합니다.
-
-    Inputs:
-      - prompt: 완성된 프롬프트 문자열
-      - model_name: 사용할 모델 이름
-
-    Returns:
-      - API 응답 텍스트
     """
     client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
     res = client.models.generate_content(
@@ -137,6 +135,32 @@ def gemini_qa(prompt: str,
     )
     return res.text if hasattr(res, "text") else str(res)
 
+
+def openai_qa(prompt: str,
+              model_name: str = "gpt-4o-mini") -> str:
+    """
+    OpenAI API에 쿼리하여 텍스트를 생성합니다.
+    """
+    client = OpenAI()
+    messages = [
+        # system 생략
+        {'role': 'user', 'content': prompt}
+    ]
+    res = client.chat.completions.create(
+        model=model_name,
+        messages=messages
+    )
+    return res.choices[0].message.content
+
+
+def qa(prompt: str, synthetic_model: str):
+    """
+    데이터 생성 시 입력된 모델 이름에 따라 생성 함수를 선택하여 실행
+    """
+    if 'gemini' in synthetic_model:
+        return gemini_qa(prompt, synthetic_model)
+    elif 'gpt' in synthetic_model:
+        return openai_qa(prompt, synthetic_model)
 
 def constraint_1(response: str, min_length: int, max_length: int) -> str:
     """ 데이터 생성 시, 길이 제약 """
@@ -182,6 +206,8 @@ def main():
     args = parse_args()
     setup_logging()
 
+    SYNTEHTIC_MODEL = args.synthetic_model
+
     # YAML 파일에서 프롬프트 템플릿 로드
     with open(args.prompt_yaml, 'r', encoding='utf-8') as f:
         prompt_cfg = yaml.safe_load(f)
@@ -197,9 +223,11 @@ def main():
     CORRECT_CONNECTOR: List[str] = conn_cfg['CORRECT_CONNECTOR']
     INCORRECT_CONNECTOR: List[str] = conn_cfg['INCORRECT_CONNECTOR']
 
-    # Gemini API 키 설정
-    if not os.getenv("GEMINI_API_KEY"):
+    # API 키 확인
+    if 'gemini' in SYNTEHTIC_MODEL.lower() and not os.getenv("GEMINI_API_KEY"):
         raise RuntimeError("ENV 변수 GEMINI_API_KEY를 설정해주세요.")
+    elif 'gpt' in SYNTEHTIC_MODEL.lower() and not os.getenv("OPENAI_API_KEY"):
+        raise RuntimeError("ENV 변수 OPENAI_API_KEY를 설정해주세요.")
 
     # 데이터셋 로드 및 샘플링
     ds = load_dataset(args.dataset_name)
@@ -233,7 +261,7 @@ def main():
             INCORRECT_CONNECTOR
         )
         for _ in range(5):
-            resp = gemini_qa(prompt)
+            resp = qa(prompt, SYNTEHTIC_MODEL)
             if not constraint_1(resp, args.constraint_min_length, args.constraint_max_length):
                 continue
 
@@ -296,7 +324,8 @@ def main():
         )
         logging.info(f"Push to hub 성공: {args.output_dir}")
     else:
-        out_ds.save_to_dist(args.output_dir)
+        os.makedirs(args.output_dir, exist_ok=True)
+        out_ds.save_to_disk(args.output_dir)
         logging.info(f"Save to disk 완료: {args.output_dir}")
 
     print(f"Completed: Saved {len(keep)} examples to {args.output_dir}. Dropped {len(drops)}.")
@@ -307,17 +336,5 @@ if __name__ == "__main__":
     # 토큰 마커
     TSTARTT, TENDT = "<thinking>", "</thinking>"
     ASTARTT, AENDT = "<answer>", "</answer>"
-
-    # logging 파일 설정
-    os.makedirs("log", exist_ok=True)
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    log_filename = os.path.join("log", f"constraint_{timestamp}.log")
-
-    logging.basicConfig(
-        filename=log_filename,
-        filemode='a',
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
-    )
 
     main()
