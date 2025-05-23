@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # ── 사용자 정의 가능 변수 ─────────────────────
-# SYNTHETIC_MODEL="gemini-2.0-flash"
-SYNTHETIC_MODEL="gpt-4o-mini"
+SYNTHETIC_MODEL="gemini-2.0-flash"
+# SYNTHETIC_MODEL="gpt-4o-mini"
 
 DATASET_NAME="datumo/datumo-gemini-short-v2"
 MODEL="Qwen/Qwen2.5-7B-Instruct"
@@ -11,7 +11,7 @@ MODEL="Qwen/Qwen2.5-7B-Instruct"
 PROMPT_YAML="config/synthetic_prompt.yaml"
 VERSION="v4"
 
-SYSTEMPROMPT_YAML="config/system_prompt.yaml"
+SYSTEM_PROMPT_YAML="config/system_prompt.yaml"
 SYSTEM_KEY="qwen"
 
 CONNECTOR_YAML="config/connector.yaml"
@@ -36,7 +36,7 @@ ARGS=(
   --model "${MODEL}"
   --prompt_yaml "${PROMPT_YAML}"
   --version "${VERSION}"
-  --systemprompt_yaml "${SYSTEMPROMPT_YAML}"
+  --system_prompt_yaml "${SYSTEM_PROMPT_YAML}"
   --system_key "${SYSTEM_KEY}"
   --connector_yaml "${CONNECTOR_YAML}"
   --output_dir "${OUTPUT_DIR}"

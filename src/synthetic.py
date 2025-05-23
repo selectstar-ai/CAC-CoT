@@ -41,7 +41,7 @@ def parse_args() -> argparse.Namespace:
     # -- PROMPT
     p.add_argument("--prompt_yaml", default="config/synthetic_prompt.yaml", help="프롬프트 템플릿 YAML 파일 경로")
     p.add_argument("--version", default='v4', help="config/synthetic_prompt.yaml 파일에서 사용할 프롬프트를 선택")
-    p.add_argument("--systemprompt_yaml", default="config/system_prompt.yaml", help="학습용 시스템 프롬프트 템플릿 YAML 파일 경로")
+    p.add_argument("--system_prompt_yaml", default="config/system_prompt.yaml", help="학습용 시스템 프롬프트 템플릿 YAML 파일 경로")
     p.add_argument("--system_key", default='qwen', help="config/system_prompt.yaml 파일에서 사용할 프롬프트를 선택")
 
     # -- CONNECTOR
@@ -98,7 +98,7 @@ def build_prompt(question: str,
     )
 
 
-def setup_logging(log_dir: str = "log", prefix: str = "constraint") -> str:
+def setup_logging(log_dir: str = "logs/generate", prefix: str = "constraint") -> str:
     """
     로그 파일을 지정된 폴더에 현재 시간 기반 이름으로 생성하고 로깅 설정을 수행합니다.
 
@@ -120,10 +120,18 @@ def setup_logging(log_dir: str = "log", prefix: str = "constraint") -> str:
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
 
+    # HTTP 디버그 로그 억제
+    for lib in ["urllib3", "httpx", "openai"]:
+        logging.getLogger(lib).setLevel(logging.WARNING)
     logging.info("로깅이 초기화되었습니다.")
 
 
-def gemini_qa(prompt: str,
+def load_yaml(path: str) -> dict:
+    with open(path, 'r', encoding='utf-8') as f:
+        return yaml.safe_load(f)
+    
+
+def call_gemini(prompt: str,
               model_name: str = "gemini-2.0-flash") -> str:
     """
     Gemini API에 쿼리하여 텍스트를 생성합니다.
@@ -136,14 +144,14 @@ def gemini_qa(prompt: str,
     return res.text if hasattr(res, "text") else str(res)
 
 
-def openai_qa(prompt: str,
+def call_openai(prompt: str,
               model_name: str = "gpt-4o-mini") -> str:
     """
     OpenAI API에 쿼리하여 텍스트를 생성합니다.
     """
     client = OpenAI()
     messages = [
-        # system 생략
+        {'role':'system','content':''},
         {'role': 'user', 'content': prompt}
     ]
     res = client.chat.completions.create(
@@ -158,9 +166,9 @@ def qa(prompt: str, synthetic_model: str):
     데이터 생성 시 입력된 모델 이름에 따라 생성 함수를 선택하여 실행
     """
     if 'gemini' in synthetic_model:
-        return gemini_qa(prompt, synthetic_model)
+        return call_gemini(prompt, synthetic_model)
     elif 'gpt' in synthetic_model:
-        return openai_qa(prompt, synthetic_model)
+        return call_openai(prompt, synthetic_model)
 
 def constraint_1(response: str, min_length: int, max_length: int) -> str:
     """ 데이터 생성 시, 길이 제약 """
@@ -209,19 +217,11 @@ def main():
     SYNTEHTIC_MODEL = args.synthetic_model
 
     # YAML 파일에서 프롬프트 템플릿 로드
-    with open(args.prompt_yaml, 'r', encoding='utf-8') as f:
-        prompt_cfg = yaml.safe_load(f)
-    PROMPT_TMPL: str = prompt_cfg[args.version]
-
-    with open(args.systemprompt_yaml, 'r', encoding='utf-8') as f:
-        system_prompt = yaml.safe_load(f)
-    SYSTEM_PROMPT: str = system_prompt[args.system_key]
-
-    # YAML 파일에서 커넥터 리스트 로드
-    with open(args.connector_yaml, 'r', encoding='utf-8') as f:
-        conn_cfg = yaml.safe_load(f)
-    CORRECT_CONNECTOR: List[str] = conn_cfg['CORRECT_CONNECTOR']
-    INCORRECT_CONNECTOR: List[str] = conn_cfg['INCORRECT_CONNECTOR']
+    PROMPT_TMPL: str = load_yaml(args.prompt_yaml)[args.version]
+    SYSTEM_PROMPT: str = load_yaml(args.system_prompt_yaml)[args.system_key]
+    CONNECTING: dict = load_yaml(args.connector_yaml)
+    CORRECT_CONNECTOR: List[str] = CONNECTING['CORRECT_CONNECTOR']
+    INCORRECT_CONNECTOR: List[str] = CONNECTING['INCORRECT_CONNECTOR']
 
     # API 키 확인
     if 'gemini' in SYNTEHTIC_MODEL.lower() and not os.getenv("GEMINI_API_KEY"):
