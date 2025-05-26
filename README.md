@@ -2,6 +2,9 @@
 Connector-Aware Compact CoT (Synthetic Method For Reasoning Data)
 
 ## Introduction
+<img src="figure/overview.png" alt="Image" width="600"/>
+<br><br>
+
 - **Last Updated:** 2025-05-26
 - 본 프로젝트는 `CAC-CoT: Connector-Aware Compact Chain-of-Thought for Efficient Reasoning Data Synthesis Across Dual-System Cognitive Tasks`의 내용이며, **추론 데이터의 생성과 생성된 데이터를 기반으로 학습 및 평가** 코드를 담고 있습니다.
 - 연결어와 길이 제약을 기반으로 추론 데이터를 합성함으로써 System-1 사고의 능력을 크게 증가시키고 System-2 사고 역시 이전 모델과 버금가는 추론 성능을 가질 수 있도록 한다.
