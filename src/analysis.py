@@ -34,8 +34,6 @@ def setup_logging(log_dir: str = "logs/evaluate") -> str:
     logging.info("Logging initialized.")
     return log_file
 
-    return log_file
-
 
 def parse_args() -> argparse.Namespace:
     """
