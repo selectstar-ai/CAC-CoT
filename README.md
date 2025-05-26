@@ -16,6 +16,10 @@ Connector-Aware Compact CoT (Synthetic Method For Reasoning Data)
 - 2025-05-23: CAC-CoT 데이터 합성 및 분석 코드 배포
 ---
 
+## Artifacts
+- Model: https://huggingface.co/datumo/CAC-CoT
+- Data: https://huggingface.co/datasets/datumo/CAC-CoT
+
 ## Usage
 ### Quick Start
 
