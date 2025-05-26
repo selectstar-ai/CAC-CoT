@@ -1,0 +1,4 @@
+python3 get_LRM_vllm_response.py
+python3 split_think_answer.py
+python3 get_LRM_eval.py
+python3 get_acc_scores.py
