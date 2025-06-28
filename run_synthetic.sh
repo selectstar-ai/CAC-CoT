@@ -9,24 +9,24 @@ DATASET_NAME="datumo/datumo-gemini-short-v2"
 MODEL="Qwen/Qwen2.5-7B-Instruct"
 
 PROMPT_YAML="config/synthetic_prompt.yaml"
-VERSION="v4"
+VERSION="v5"
 
 SYSTEM_PROMPT_YAML="config/system_prompt.yaml"
 SYSTEM_KEY="qwen"
 
 CONNECTOR_YAML="config/connector.yaml"
 
-OUTPUT_DIR="data/out_sample"
+OUTPUT_DIR="data/v5"
 PUSH_TO_HUB=false   # true or false
 HF_TOKEN=""         # 허브 푸시할 때만 설정
 
 MIN_LEN=100
 MAX_LEN=30000
 
-TEST_MODE=true      # true → 샘플링 실행, false → 전체 실행
+TEST_MODE=false      # true → 샘플링 실행, false → 전체 실행
 SAMPLE_SIZE=10      # TEST_MODE=true일 때만 적용
 
-NUM_WORKERS=4
+NUM_WORKERS=30
 # ─────────────────────────────────────────────
 
 # ── 실제 실행 ────────────────────────────────

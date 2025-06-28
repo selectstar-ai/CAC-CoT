@@ -141,6 +141,10 @@ def call_gemini(prompt: str,
         model=model_name,
         contents=prompt
     )
+    # print("-" * 50)
+    # print(res.text)
+    # print(len(res.text))
+    # print("-" * 50)
     return res.text if hasattr(res, "text") else str(res)
 
 
@@ -280,6 +284,7 @@ def main():
         for idx, thinking, answer, dropped in tqdm(
                 executor.map(worker, enumerate(q_list)),
                 total=len(q_list), desc="Generating"):
+            logging.info(f"진행 중 ... {idx}/{len(q_list)}")
             if dropped:
                 drops.append(idx)
             results[idx] = (thinking, answer)
@@ -312,9 +317,10 @@ def main():
             "solution": sol_list,
             "thinking_trajectories": thinkings,
             "attempt": attempts,
-            "texts": tokenized(q_list, thinkings, attempts, SYSTEM_PROMPT, args.model)
+            "text": tokenized(q_list, thinkings, attempts, SYSTEM_PROMPT, args.model)
         })
     })
+    print(out_ds)
 
     if args.push_to_hub:
         out_ds.push_to_hub(

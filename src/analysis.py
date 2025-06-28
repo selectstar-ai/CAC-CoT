@@ -3,7 +3,9 @@ import argparse
 import logging
 import yaml
 import concurrent.futures
+import numpy as np
 
+from transformers import AutoTokenizer
 from datasets import load_dataset, load_from_disk, DatasetDict
 from typing import List, Tuple
 from tqdm import tqdm
@@ -78,13 +80,22 @@ def load_data(path: str, mode: str):
     return ds
 
 
+def count_tokens(text: str, tokenizer) -> int:
+    tokens = tokenizer.encode(text, add_special_tokens=False)
+    return len(tokens)
+
+
 def analyze_basic(ds, correct_conn: List[str], incorrect_conn: List[str]):
     """
     기본 메트릭(갯수, 평균 길이, 커넥터 및 final answer 출현 횟수)을 계산해 출력/로깅합니다.
     """
     print(ds)
     thinkings = ds['thinking_trajectories']
+    thinkings = [inner[0] if isinstance(inner, list) else inner for inner in thinkings]
     answers = ds['attempt']
+    
+    tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-7B-Instruct", trust_remote_code=True)
+    avg_token_len = np.mean([count_tokens(ex, tokenizer) for ex in thinkings])
 
     failed = sum(1 for t in thinkings if 'Reasoning failed' in t)
     cnt = len(thinkings)
@@ -94,13 +105,14 @@ def analyze_basic(ds, correct_conn: List[str], incorrect_conn: List[str]):
     fa = sum(1 for a in answers if 'final answer' in a.lower())
 
     # 터미널 출력
-    print(f"Count: {cnt}, Failed: {failed}, AvgLen: {avg_len:.1f}")
+    print(f"Count: {cnt}, Failed: {failed}, AvgLen: {avg_len:.2f}, AvgTokenLen: {avg_token_len:.2f}")
     print(f"CorrectConn: {cc}, IncorrectConn: {ic}, FinalAnswer: {fa}")
 
      # 로깅
     logging.info(f"Total(전체 데이터의 개수): {cnt}")
     logging.info(f"Failed(Reasoning Failed 데이터의 개수): {failed}")
-    logging.info(f"Avg reasoning length (평균 길이) {avg_len:.1f}")
+    logging.info(f"Avg reasoning length (평균 길이) {avg_len:.2f}")
+    logging.info(f"Avg reasoning token length (평균 토큰 길이) {avg_token_len:.2f}")
     logging.info(f"CorrectConn hits (CORRECT CONNECTOR 개수): {cc}")
     logging.info(f"IncorrectConn hits (INCORRECT CONNECTOR 개수): {ic}")
     logging.info(f"FinalAnswers (FINAL ANSWER가 포함된 데이터의 개수): {fa}")

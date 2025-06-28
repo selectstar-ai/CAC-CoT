@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # ── 사용자 설정 (원하는 값으로 수정) ─────────────────
-DATA_PATH="data/out_sample"          # HF dataset name or local path
-LOAD_TYPE="disk"                       # hf or disk
+DATA_PATH="datumo/CAC-CoT"          # HF dataset name or local path
+LOAD_TYPE="hf"                       # hf or disk
 CONNECTOR_YAML="config/connector.yaml"
 GRADING_PROMPT="config/grading_prompt.yaml"
 EVAL_MODEL="gpt-4o-mini"
