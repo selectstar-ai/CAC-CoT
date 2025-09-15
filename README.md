@@ -56,6 +56,7 @@ src/s1/train/sft.sh
 
 ## 프로젝트 구조
 
+```python
 ├── config              # prompt, connector
 ├── data                # used for storing synthesized data locally
 ├── LICENSE
@@ -73,3 +74,4 @@ src/s1/train/sft.sh
 │   ├── s1_bench        # evaluation code/execution
 │   └── synthetic.py    # synthesis code
 └── wandb
+```
