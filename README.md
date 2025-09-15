@@ -56,7 +56,7 @@ src/s1/train/sft.sh
 
 ## Project Structure
 
-```python
+```
 ├── config              # prompt, connector
 ├── data                # used for storing synthesized data locally
 ├── LICENSE
@@ -79,7 +79,7 @@ src/s1/train/sft.sh
 ## Citation
 Please consider citing the following paper if our method and resources were helpful to your work.
 
-```python
+```
 @misc{choi2025caccotconnectorawarecompactchainofthought,
       title={CAC-CoT: Connector-Aware Compact Chain-of-Thought for Efficient Reasoning Data Synthesis Across Dual-System Cognitive Tasks}, 
       author={Sunguk Choi and Yonghoon Kwon and Heondeuk Lee},
