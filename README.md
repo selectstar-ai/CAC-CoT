@@ -77,8 +77,9 @@ src/s1/train/sft.sh
 ```
 
 ## Citation
-Please kindly cite the following paper if you found our method and resources helpful!
+Please consider citing the following paper if our method and resources were helpful to your work.
 
+```python
 @misc{choi2025caccotconnectorawarecompactchainofthought,
       title={CAC-CoT: Connector-Aware Compact Chain-of-Thought for Efficient Reasoning Data Synthesis Across Dual-System Cognitive Tasks}, 
       author={Sunguk Choi and Yonghoon Kwon and Heondeuk Lee},
@@ -88,6 +89,7 @@ Please kindly cite the following paper if you found our method and resources hel
       primaryClass={cs.AI},
       url={https://arxiv.org/abs/2508.18743}, 
 }
+```
 
 ## Miscellaneous
-Please send any questions about the code and/or the algorithm to sunguk.choi@selectstar.ai
+For any questions regarding the code and/or the algorithm, please contact `sunguk.choi@selectstar.ai`
