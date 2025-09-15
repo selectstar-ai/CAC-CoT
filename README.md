@@ -6,14 +6,14 @@ Connector-Aware Compact CoT (Synthetic Method For Reasoning Data)
 <br><br>
 
 - **Last Updated:** 2025-05-26
-- 본 프로젝트는 `CAC-CoT: Connector-Aware Compact Chain-of-Thought for Efficient Reasoning Data Synthesis Across Dual-System Cognitive Tasks`의 내용이며, **추론 데이터의 생성과 생성된 데이터를 기반으로 학습 및 평가** 코드를 담고 있습니다.
-- 연결어와 길이 제약을 기반으로 추론 데이터를 합성함으로써 System-1 사고의 능력을 크게 증가시키고 System-2 사고 역시 이전 모델과 버금가는 추론 성능을 가질 수 있도록 한다.
+- This project is based on CAC-CoT: Connector-Aware Compact Chain-of-Thought for Efficient Reasoning Data Synthesis Across Dual-System Cognitive Tasks, and contains code for **reasoning data generation, as well as training and evaluation based on the generated data.**
+- By synthesizing reasoning data under connector and length constraints, the approach significantly enhances System-1 reasoning capabilities, while also enabling System-2 reasoning to achieve performance comparable to previous models.
 
 ---
 **Updates**:
-- (예정): 추론 모델 평가 코드 배포 (based s1_bench, system_2_eval)
-- 2025-05-26: 추론 모델 학습 코드 배포 (based s1)
-- 2025-05-23: CAC-CoT 데이터 합성 및 분석 코드 배포
+- (Planned): Release of reasoning model evaluation code (system_2_eval)
+- 2025-05-26: Release of reasoning model training code, and evaluation code (based on s1 and s1_bench)
+- 2025-05-23: Release of CAC-CoT data synthesis and analysis code
 ---
 
 ## Artifacts
@@ -30,48 +30,46 @@ cd CAC-CoT
 pip3 install -r requirements.txt
 ```
 
-**CAC-CoT 데이터 생성**
+**CAC-CoT Data Generation**
 ```python
 ./run_synthetic.sh
 ```
 
-**CAC-CoT 데이터 분석**
+**CAC-CoT Data Analysis**
 ```python
 ./run_analysis.sh
 ```
 
-**모델 학습(based s1)**
+**Model Training(based s1)**
 ```python
 src/s1/train/sft.sh
 ```
 
-**모델 추론**
-- (추가 예정)
+**Model Inference**
+- (Planned)
 
 ### Results
-- 데이터 합성(생성): `OUTPUT_DIR or HUGGINFACE_DIR`
-- 합성 데이터 분석: `logs/evaluate`
-- 모델 학습: `ckpts/`
-- 모델 평가: (예정)
+- Data Synthesis (Generation) Results: `OUTPUT_DIR or HUGGINFACE_DIR`
+- Synthesized Data Analysis Results: `logs/evaluate`
+- Model Training Results: `ckpts/`
+- Model Evaluation Results: (Planned)
 
 ## 프로젝트 구조
 
-```
-├── config              # prompt, connector 
-├── data                # 합성 데이터 로컬 저장 시 사용
+├── config              # prompt, connector
+├── data                # used for storing synthesized data locally
 ├── LICENSE
-├── logs                # 합성/분석 시 log 기록
+├── logs                # logs from synthesis/analysis
 │   ├── analysis
 │   └── generate
-├── notebook            # notebook 실험 코드
+├── notebook            # experimental notebooks
 ├── README.md
 ├── requirements.txt    
-├── run_analysis.sh     # 분석 실행
-├── run_synthetic.sh    # 합성 실행
+├── run_analysis.sh     # run analysis
+├── run_synthetic.sh    # run synthesis
 ├── src
-│   ├── analysis.py     # 분석 코드
-│   ├── s1              # 학습 코드/실행
-│   ├── s1_bench        # 평가 코드/실행
-│   └── synthetic.py    # 합성 코드
+│   ├── analysis.py     # analysis code
+│   ├── s1              # training code/execution
+│   ├── s1_bench        # evaluation code/execution
+│   └── synthetic.py    # synthesis code
 └── wandb
-```
