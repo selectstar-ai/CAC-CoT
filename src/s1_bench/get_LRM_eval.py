@@ -21,7 +21,9 @@ def get_evaluator_response(prompt):
     maxtry = 10     
     delay = 5      
         
-    openai_api_key = "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"
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    if not openai_api_key:
+        raise ValueError("OPENAI_API_KEY environment variable is not set")
     openai_api_base = "https://api.openai.com/v1"
 
     conversation = [{"role":"user", "content": prompt}]

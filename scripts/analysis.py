@@ -10,8 +10,17 @@ from datasets import load_dataset, load_from_disk, DatasetDict
 from typing import List, Tuple
 from tqdm import tqdm
 from datetime import datetime
-
 from dotenv import load_dotenv
+import sys
+
+# Find root to load config
+def get_project_root():
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+sys.path.append(get_project_root())
+
+from src.utils.config_loader import load_config, load_prompts
+
 load_dotenv()
 
 def setup_logging(log_dir: str = "logs/evaluate") -> str:
@@ -49,11 +58,11 @@ def parse_args() -> argparse.Namespace:
 
 
     # -- CONNECTOR
-    p.add_argument("--connector_yaml", default="config/connector.yaml", help="커넥터 리스트 YAML 경로")
+    p.add_argument("--connector_yaml", default="configs/connectors.yaml", help="커넥터 리스트 YAML 경로")
 
     # -- GRADING
     p.add_argument("--grade_accuracy", action='store_true', help="GPT 기반 정확도 평가 수행")
-    p.add_argument("--grading_prompt_yaml", default="config/grading_prompt.yaml", help="정답 평가용 프롬프트 YAML 경로")
+    p.add_argument("--grading_prompt_yaml", default="prompts/prompts.yaml", help="정답 평가용 프롬프트 YAML 경로")
     p.add_argument("--evaluate_model", default="gpt-4o-mini", help="평가 모델 선택 (틱 1: gpt-4o-mini or gpt-4o)")
     p.add_argument("--num_workers", type=int, default=4, help="병렬 워커 수")
     
@@ -64,9 +73,8 @@ def load_connectors(yaml_path: str) -> Tuple[List[str], List[str]]:
     """
     YAML에서 CORRECT/INCORRECT 커넥터 리스트를 로드합니다.
     """
-    with open(yaml_path, 'r', encoding='utf-8') as f:
-        cfg = yaml.safe_load(f)
-    return cfg['CORRECT_CONNECTOR'], cfg['INCORRECT_CONNECTOR']
+    cfg = load_config(yaml_path)
+    return cfg['correct_connector'], cfg['incorrect_connector']
 
 
 def load_data(path: str, mode: str):
@@ -123,10 +131,9 @@ def grade_accuracy(ds, prompt_yaml: str, model: str, num_workers: int):
     OpenAI GPT를 사용해 시도(attempt) vs 정답(solution) 비교 후 정확도를 계산합니다.
     """
     # YAML 로드
-    with open(prompt_yaml, 'r', encoding='utf-8') as f:
-        prompts = yaml.safe_load(f)
-    system_prompt = prompts['system_prompt']
-    user_prompt = prompts['user_prompt']
+    prompts = load_prompts(prompt_yaml)
+    system_prompt = prompts['system']['grading']
+    user_prompt = prompts['user']['grading']
 
     def grader(pair: Tuple[str, str]) -> bool:
         att, sol = pair

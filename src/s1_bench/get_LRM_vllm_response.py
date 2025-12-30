@@ -37,7 +37,7 @@ def get_data(only_en:bool = False):
 #         f.write(json_str)
 
 
-def init_main(model_name, k, is_greedy, only_en):
+def init_main(model_name, k, is_greedy, only_en, model_path=None):
     local_model_list = {
         "DS-R1-1.5B": "local-model-path",
         "DS-R1-7B": "local-model-path",
@@ -74,8 +74,9 @@ def init_main(model_name, k, is_greedy, only_en):
     print(f"读取eval数据 {len(data_list)} 条")
 
     """ begin load model """
-    tokenizer = AutoTokenizer.from_pretrained(local_model_list[model_name])
-    model = LLM(model=local_model_list[model_name], 
+    final_model_path = model_path if model_path else local_model_list[model_name]
+    tokenizer = AutoTokenizer.from_pretrained(final_model_path)
+    model = LLM(model=final_model_path, 
                 trust_remote_code=True, 
                 gpu_memory_utilization=0.95,
                 tensor_parallel_size=MODEL_CONFIG[model_name]['n_gpu'],
@@ -148,4 +149,7 @@ if __name__ == "__main__":
     parser.add_argument("--only_en", type=lambda x: x.lower() == "true", default=False)
     args = parser.parse_args()
 
-    init_main(args.model, k=args.k, is_greedy=args.greedy, only_en=args.only_en)
+    parser.add_argument("--model_path", type=str, default=None, help="Path to the model (overrides built-in list)")
+    args = parser.parse_args()
+
+    init_main(args.model, k=args.k, is_greedy=args.greedy, only_en=args.only_en, model_path=args.model_path)

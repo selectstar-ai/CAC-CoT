@@ -12,7 +12,17 @@ from datasets import load_dataset, Dataset, DatasetDict
 from typing import Tuple, List
 from tqdm import tqdm
 from dotenv import load_dotenv
+import sys
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Find root to load config
+def get_project_root():
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+sys.path.append(get_project_root())
+
+from src.utils.config_loader import load_config, load_prompts
 
 load_dotenv()
 
@@ -39,13 +49,13 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--model", default="Qwen/Qwen2.5-7B-Instruct")
 
     # -- PROMPT
-    p.add_argument("--prompt_yaml", default="config/synthetic_prompt.yaml", help="프롬프트 템플릿 YAML 파일 경로")
+    p.add_argument("--prompt_yaml", default="prompts/prompts.yaml", help="프롬프트 템플릿 YAML 파일 경로")
     p.add_argument("--version", default='v4', help="config/synthetic_prompt.yaml 파일에서 사용할 프롬프트를 선택")
-    p.add_argument("--system_prompt_yaml", default="config/system_prompt.yaml", help="학습용 시스템 프롬프트 템플릿 YAML 파일 경로")
+    p.add_argument("--system_prompt_yaml", default="prompts/prompts.yaml", help="학습용 시스템 프롬프트 템플릿 YAML 파일 경로")
     p.add_argument("--system_key", default='qwen', help="config/system_prompt.yaml 파일에서 사용할 프롬프트를 선택")
 
     # -- CONNECTOR
-    p.add_argument("--connector_yaml", default="config/connector.yaml", help="커넥터 리스트 YAML 파일 경로")
+    p.add_argument("--connector_yaml", default="configs/connectors.yaml", help="커넥터 리스트 YAML 파일 경로")
 
     # -- SAVE
     p.add_argument("--output_dir", required=True, help="출력 디렉토리 경로")
@@ -221,11 +231,13 @@ def main():
     SYNTEHTIC_MODEL = args.synthetic_model
 
     # YAML 파일에서 프롬프트 템플릿 로드
-    PROMPT_TMPL: str = load_yaml(args.prompt_yaml)[args.version]
-    SYSTEM_PROMPT: str = load_yaml(args.system_prompt_yaml)[args.system_key]
-    CONNECTING: dict = load_yaml(args.connector_yaml)
-    CORRECT_CONNECTOR: List[str] = CONNECTING['CORRECT_CONNECTOR']
-    INCORRECT_CONNECTOR: List[str] = CONNECTING['INCORRECT_CONNECTOR']
+    _prompts = load_prompts(args.prompt_yaml)
+    PROMPT_TMPL: str = _prompts['synthetic'][args.version]
+    SYSTEM_PROMPT: str = _prompts['system'][args.system_key]
+    
+    CONNECTING: dict = load_config(args.connector_yaml)
+    CORRECT_CONNECTOR: List[str] = CONNECTING['correct_connector']
+    INCORRECT_CONNECTOR: List[str] = CONNECTING['incorrect_connector']
 
     # API 키 확인
     if 'gemini' in SYNTEHTIC_MODEL.lower() and not os.getenv("GEMINI_API_KEY"):

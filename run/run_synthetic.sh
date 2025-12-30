@@ -8,13 +8,13 @@ SYNTHETIC_MODEL="gemini-2.0-flash"
 DATASET_NAME="datumo/datumo-gemini-short-v2"
 MODEL="Qwen/Qwen2.5-7B-Instruct"
 
-PROMPT_YAML="config/synthetic_prompt.yaml"
+PROMPT_YAML="prompts/prompts.yaml"
 VERSION="v5"
 
-SYSTEM_PROMPT_YAML="config/system_prompt.yaml"
+SYSTEM_PROMPT_YAML="prompts/prompts.yaml"
 SYSTEM_KEY="qwen"
 
-CONNECTOR_YAML="config/connector.yaml"
+CONNECTOR_YAML="configs/connectors.yaml"
 
 OUTPUT_DIR="data/v5"
 PUSH_TO_HUB=false   # true or false
@@ -55,4 +55,4 @@ if [ "${PUSH_TO_HUB}" = true ]; then
   ARGS+=( --push_to_hub --token "${HF_TOKEN}" )
 fi
 
-python src/synthetic.py "${ARGS[@]}"
+python src/curation/synthetic.py "${ARGS[@]}"
