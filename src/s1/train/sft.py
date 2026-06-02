@@ -40,7 +40,7 @@ def train():
     else:
         model = transformers.AutoModelForCausalLM.from_pretrained(config.model_name)
 
-    dataset = load_dataset(config.train_file_path, token='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')
+    dataset = load_dataset(config.train_file_path, token=os.getenv("HF_TOKEN"))
 
     # setting up trainer
     tokenizer = transformers.AutoTokenizer.from_pretrained(config.model_name, use_fast=True)
